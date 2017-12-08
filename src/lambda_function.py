@@ -21,9 +21,8 @@ TIMESTAMP_FIELDS = [
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
-connection = pymysql.connect(host=DATABASE_HOST, db=DATABASE_NAME, user=DATABASE_USER, password=DATABASE_PASSWORD,
+connection = pymysql.connect(host=DATABASE_HOST, user=DATABASE_USER, password=DATABASE_PASSWORD,
                              charset='utf8', cursorclass=pymysql.cursors.DictCursor)
-
 
 def lambda_handler(event, context):
     with Database(connection) as database:
@@ -139,6 +138,12 @@ class Database:
 
     def __enter__(self):
         self.cursor = self.connection.cursor()
+        try:
+            self.connection.select_db(DATABASE_NAME)
+        except pymysql.err.DatabaseError:
+            self.ensure_database()
+            self.connection.select_db(DATABASE_NAME)
+
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -150,6 +155,9 @@ class Database:
             self.connection.rollback()
 
         self.cursor = None
+
+    def ensure_database(self):
+        self.__execute("CREATE DATABASE %s CHARSET 'utf8' COLLATE 'utf8_general_ci'" % self.__quote_name(DATABASE_NAME))
 
     def ensure_table(self, table, primary_keys):
         if table in self.tables:

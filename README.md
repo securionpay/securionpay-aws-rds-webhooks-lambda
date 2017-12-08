@@ -101,7 +101,6 @@ Here’s the most common setup for using Lambda from this repository:
  - Change "Code entry type" to "Upload a .ZIP file"
  - Click "Upload" under "Function package" label
  - Upload ZIP file downloaded from [releases page](https://github.com/securionpay/securionpay-aws-rds-webhooks-lambda/releases)
- - Change "Handler" to "securionpay_webhooks_import.lambda_handler"
  - Click "Save" (in the upper-right corner)
 - In "Environment variables" tab add following keys:
  - "database_host" - endpoint of your RDS instance (for example "securionpay-webhooks.aaa.eu-west-1.rds.amazonaws.com")
